@@ -1,4 +1,15 @@
+*{
+    padding: 0;
+    margin: 0;
+}
 body{
     text-align: center;
-    padding-top: 38%;
+}
+
+p{
+    margin-top: 5px;
+}
+#fire:hover{ 
+color: red;
+
 }
