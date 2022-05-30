@@ -28,12 +28,31 @@ let pokemonRepository = (function () {
             height: 0.5
         },
     ];
-  
+    function addListItem(pokemon){
+        let deckContainer = document.querySelector('.pokemon-list');
+        let deckCard = document.createElement('li');
+        let cardButton = document.createElement('button');
+        cardButton.innerText = pokemon.name;
+        cardButton.classList.add('card-button');
+        cardButton.addEventListener('click', showDetails(pokemon));
+        deckCard.appendChild(cardButton);
+        deckContainer.appendChild(deckCard);
+    }
+    function showDetails(pokemon){
+        return function(){
+            console.log(pokemon);
+        }
+     }
+
     function add(pokemon) {
-        if(typeof pokemon === 'object'){
+        if(typeof pokemon === 'object' &&
+        'name'in pokemon &&
+        'types' in pokemon &&
+        'height' in pokemon
+        ){
             pokemonList.push(pokemon);
         }else{
-            return;
+            console.log("Invalid or Incomplete Data for Pokemon")
         }
     }
   
@@ -43,37 +62,45 @@ let pokemonRepository = (function () {
   
     return {
       add: add,
-      getAll: getAll
+      getAll: getAll,
+      addListItem: addListItem
     };
   })();
  
+
+
 //loop that writes each pokemon to the document, with some additions for "type: Fire"
-    function buildCard(pokemon){
-        if(pokemon.types == 'Fire'){
-            document.write(`<p id="fire">${pokemon.name} (${pokemon.height}m) </p> <br>`) 
-        }else if(pokemon.height > 1){
-            document.write(`<p>${pokemon.name} (${pokemon.height}m) Wow, thats big!</p> <br> `)
-        }else{
-            document.write(`<p>${pokemon.name} (${pokemon.height}m) </p> <br> `)
-        }
-    }
-    pokemonRepository.getAll().forEach(buildCard); 
-//bonus task. Search functionality that returns pokemon info to the console.  
-   let searchResult = []
-   let userSearch = document.getElementById('search')
-   let submit = document.getElementById('sub')
-   submit.addEventListener('click', (e) =>{
-        e.preventDefault();
-        filterList();
-        console.log(searchResult)
-        userSearch.value = " "
-   })
    
-   function filterList(){
-    let searchParam =  userSearch.value;
-    filteredResult = pokemonRepository.getAll().filter(pokemon => pokemon.name == searchParam);
-    searchResult.push(filteredResult);
-}
+pokemonRepository.getAll().forEach(function (pokemon) {
+    pokemonRepository.addListItem(pokemon);
+}); 
+
+
+//bonus task. Search functionality that appends the searched pokemon to a display box
+//In the future, I want the search to live-refresh the displayed pokemon on the page.
+let filteredResult = {}
+let returnString = ' '
+let userSearch = document.getElementById('search');
+const searchDisplay = document.getElementById('search-display');
+const searchForm = document.querySelector('#search-bar')
+searchForm.addEventListener('submit', (e) =>{
+     e.preventDefault();
+     filterList();
+     returnResult();
+     console.log(returnString)
+     userSearch.value ="";
+})
+
+function filterList(){
+    filteredResult = pokemonRepository.getAll().filter(pokemon => pokemon.name == userSearch.value);
+    returnString = JSON.stringify(filteredResult)
    
 
-   
+}
+
+function returnResult(){
+let searchedPokemonButton = document.createElement('li');
+searchedPokemonButton.classList.add('search-result-items')
+searchedPokemonButton.innerText = (returnString)
+searchDisplay.appendChild(searchedPokemonButton);
+}

@@ -2,14 +2,59 @@
     padding: 0;
     margin: 0;
 }
-body{
+h1{
+    margin: 10px;
     text-align: center;
 }
-
-p{
-    margin-top: 5px;
+ul{
+    padding-left: 10px;
+    justify-content: space-evenly;
 }
-#fire:hover{ 
-color: red;
+li{
+    display: inline-flex;
+}
+button,
+.card-button{
+    padding: 5px 10px;
+    display: inline-block;
+    margin: 2px;
+    background: rgba(239, 209, 201, 0.896);
+    border: none;
+    border-radius: 6px;
+    color: rgb(58, 33, 3);
+    transition:250ms ease;
+}
+.card-button:hover{
+    transform: scale(1.08);
+    box-shadow: 2px 2px 2px 2px rgba(39, 37, 37, 0.568);
+}
+
+/* search and search results */
+
+.search-result-items{
+background: rgba(17, 105, 17, 0.418) ;
+}
+#search-bar{
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: 5%;
+    top: 5%;
+}
+
+#search-display{
+display: flex;
+flex-direction: column;
+}
+
+/* everything looks good right now on the various platforms that I've tried. I will add code bellow as needed */
+@media all and (max-width: 500px){
+
+}
+@media all and (min-width: 500px) and (max-width: 750px){
+
+}
+@media all and (max-width: 750px){
 
 }

@@ -8,9 +8,18 @@
     <link rel="stylesheet" href="CSS/style.css">
 </head>
 <body>
-   <input id="search" type="text">
-   <button id="sub" type ="submit">+</button>
-   <div id="search-results"></div>
+    <header>
+        <h1>Pokedex</h1>
+        <form id="search-bar">
+            <div class="search">
+            <input id="search" type="text" placeholder="Search Pokemon">
+            <button id="sub" type="submit">+</button>
+            </div>
+            <ul id="search-display"></ul>
+        </form>
+    </header>
+    <br>
+    <ul class='pokemon-list'></ul>
     <script src="JS/script.js"></script>
 </body>
 </html>
