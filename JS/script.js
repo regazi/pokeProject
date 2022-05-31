@@ -1,33 +1,8 @@
-
-//Pokemon Deck wrapped in IIFE with 'add' && 'get all' methods---------------------------------------------------------  
+//Pokemon Deck wrapped in IIFE with 'add' && 'get all' methods = = = = = = 
 let pokemonRepository = (function () {
-    let pokemonList = [
-        {
-            name: 'Bulbasaur',
-            types: ['Grass', 'Poison'], 
-            height: 0.7
-        },
-        {
-            name: 'Ivysaur', 
-            types: ['Grass', 'Poison'], 
-            height: 1
-        },
-        {
-            name: 'Venusaur', 
-            types: ['Grass', 'Poison'], 
-            height: 2
-        },
-        {
-            name: 'Charmander', 
-            types: ['Fire'], 
-            height: 0.6
-        },
-        {
-            name: 'Jigglypuff', 
-            types: ['Fairy', 'Normal'], 
-            height: 0.5
-        },
-    ];
+    let pokemonList = [];
+    let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
+
     function addListItem(pokemon){
         let deckContainer = document.querySelector('.pokemon-list');
         let deckCard = document.createElement('li');
@@ -38,17 +13,48 @@ let pokemonRepository = (function () {
         deckCard.appendChild(cardButton);
         deckContainer.appendChild(deckCard);
     }
-    function showDetails(pokemon){
-        return function(){
-            console.log(pokemon);
-        }
-     }
+
+    //initilize elements for "show details" function --------------------------------
+    let glass = document.createElement('div');
+    let exitGlass = document.createElement('button');
+    let imgPoke = document.createElement('img');
+    let list = document.createElement('ul');
+    list.classList.add('glass-list');
+    let heightPoke = document.createElement('li');
+    let namePoke = document.createElement('li');
+    // currently displaying the pokemon types in stringified JSON. It looks bad. Change ASAP
+    let typesPoke = document.createElement('div');
+    typesPoke.classList.add('types-list')
+
+   // let typesPoke = document.createElement('li');
+ function showDetails(pokemon) {
+        return function(){loadDetails(pokemon).then(function () {
+            imgPoke.setAttribute('src', pokemon.imageUrl);imgPoke.setAttribute('src', pokemon.imageUrl);
+            heightPoke.innerText = pokemon.height;
+            namePoke.innerText = pokemon.name
+            glass.appendChild(imgPoke);
+            list.appendChild(namePoke);
+            list.appendChild(heightPoke);
+            glass.appendChild(exitGlass);
+            //Im sure theres a better way to do this-----------------------------------
+            typesPoke.innerText = JSON.stringify(pokemon.types)
+            list.appendChild(typesPoke);
+            glass.appendChild(list);
+            header.appendChild(glass);
+            glass.classList.add('glass');
+            exitGlass.classList.add('exitGlass');
+            exitGlass.addEventListener('click', (e) =>{
+                header.removeChild(glass);
+                typesPoke.innerText = "";
+           });
+        })
+    }
+
+}
 
     function add(pokemon) {
-        if(typeof pokemon === 'object' &&
-        'name'in pokemon &&
-        'types' in pokemon &&
-        'height' in pokemon
+        if(typeof pokemon === "object" &&
+        "name"in pokemon 
         ){
             pokemonList.push(pokemon);
         }else{
@@ -59,48 +65,105 @@ let pokemonRepository = (function () {
     function getAll() {
       return pokemonList;
     }
-  
+    //Loading pokemon API = = = = = = = = = = = = = = = = 
+    //Loading and loading-error custom pop-ups - - - - - 
+    
+    let header = document.querySelector('header')
+    let alertContainer = document.createElement('div');
+    let alertMsg = document.createElement('h2')
+   
+    function displayLoadError(){
+        alertContainer.classList.add('error-alert')
+        alertMsg.innerText = "Error Loading Resources";
+        alertContainer.appendChild(alertMsg)
+        header.appendChild(alertContainer)
+        setTimeOut(function () {
+            header.removeChild(alertContainer);
+            alertContainer.classList.remove('error-alert');
+        },1000)
+    }    
+    
+    function displayLoading(){
+        alertContainer.classList.add('loading-alert')
+        alertMsg.innerText = "Loading";
+        alertContainer.appendChild(alertMsg)
+        header.appendChild(alertContainer)
+    }    
+    function hideLoading(){
+        header.removeChild(alertContainer)
+        alertContainer.classList.remove('error-alert')
+    }
+    //fetch data from API --------------------------------
+    function loadList() {
+        displayLoading();
+        return fetch(apiUrl).then(function (response) {
+          return response.json();
+        }).then(function (json) {
+            hideLoading();
+          json.results.forEach(function (item) {
+            let pokemon = {
+              name: item.name,
+              detailsUrl: item.url
+            };
+            add(pokemon);
+          });
+        }).catch(function (e) {
+          console.error(e);
+          displayLoadError()
+        })
+    }
+
+
+    function loadDetails(item) {
+        displayLoading();
+        let url = item.detailsUrl;
+        return fetch(url).then(function (response) {
+            return response.json();
+        }).then(function (details) {
+            hideLoading();
+            item.imageUrl = details.sprites.front_default;
+            item.height = details.height;
+            item.types = details.types;
+        }).catch(function (e) {
+            console.error(e);
+            displayCatch()
+        });
+
+    };
+    // return Values------------------------------------
     return {
       add: add,
       getAll: getAll,
-      addListItem: addListItem
+      addListItem: addListItem,
+      loadList: loadList,
+      loadDetails: loadDetails
     };
   })();
- 
 
 
-//loop that writes each pokemon to the document, with some additions for "type: Fire"
-   
-pokemonRepository.getAll().forEach(function (pokemon) {
+
+//async load pokemon repositorys from API and create pokemon
+pokemonRepository.loadList().then(function() {
+    pokemonRepository.getAll().forEach(function(pokemon){
     pokemonRepository.addListItem(pokemon);
-}); 
+    });
+});
 
-
-//bonus task. Search functionality that appends the searched pokemon to a display box
-//In the future, I want the search to live-refresh the displayed pokemon on the page.
+//search functionality that I cant figure out right now. WIll fix later
 let filteredResult = {}
-let returnString = ' '
 let userSearch = document.getElementById('search');
-const searchDisplay = document.getElementById('search-display');
 const searchForm = document.querySelector('#search-bar')
 searchForm.addEventListener('submit', (e) =>{
      e.preventDefault();
      filterList();
-     returnResult();
-     console.log(returnString)
      userSearch.value ="";
 })
 
 function filterList(){
-    filteredResult = pokemonRepository.getAll().filter(pokemon => pokemon.name == userSearch.value);
-    returnString = JSON.stringify(filteredResult)
-   
+    filteredResult = pokemonRepository.getAll().filter(pokemon => pokemon.name.toLowerCase() === userSearch.value.toLowerCase());
+
+    console.log(JSON.stringify(filteredResult))
 
 }
 
-function returnResult(){
-let searchedPokemonButton = document.createElement('li');
-searchedPokemonButton.classList.add('search-result-items')
-searchedPokemonButton.innerText = (returnString)
-searchDisplay.appendChild(searchedPokemonButton);
-}
+
