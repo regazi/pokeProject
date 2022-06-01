@@ -1,6 +1,7 @@
 *{
     padding: 0;
     margin: 0;
+    box-sizing: border-box
 }
 h1{
     margin: 10px;
@@ -60,11 +61,13 @@ flex-direction: column;
 position: absolute;
 right: 30%;
 top:45%;
+z-index: 4;
 }
 .loading-alert{
 position: absolute;
 right: 48%;
 top:45%;
+z-index: 4;
 }
 /* for displaying additional info on the pokemon */
 .glass{
@@ -74,7 +77,8 @@ top:45%;
     height: 40%;
     width: 50%;
     border-radius: 12px;
-    overflow: scroll;
+    overflow-x: scroll;
+    overflow-y: hidden;
     right: 25%;
     top: 23%;
     display: flex;
@@ -99,10 +103,25 @@ top:45%;
 }
 /* everything looks good right now on the various platforms that I've tried. I will add code bellow as needed */
 @media all and (max-width: 500px){
-   
+    #search-bar{
+        margin-top:4%;
+        left: 5%;
+        margin-bottom: 4%;
+    }
+    .pokemon-list{
+        margin-top: 4%;
+        margin-bottom: 4%;
+    }
 }
 @media all and (min-width: 500px) and (max-width: 750px){
-
+    #search-bar{
+        margin-top:4%;
+        margin-bottom: 4%;
+    }
+    .pokemon-list{
+        margin-top: 4%;
+        margin-bottom: 4%;
+    }
 }
 @media all and (max-width: 750px){
 

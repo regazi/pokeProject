@@ -1,10 +1,10 @@
 //Pokemon Deck wrapped in IIFE with 'add' && 'get all' methods = = = = = = 
+const deckContainer = document.querySelector('.pokemon-list');
 let pokemonRepository = (function () {
     let pokemonList = [];
     let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
 
     function addListItem(pokemon){
-        let deckContainer = document.querySelector('.pokemon-list');
         let deckCard = document.createElement('li');
         let cardButton = document.createElement('button');
         cardButton.innerText = pokemon.name;
@@ -27,9 +27,9 @@ let pokemonRepository = (function () {
     typesPoke.classList.add('types-list')
 
    // let typesPoke = document.createElement('li');
- function showDetails(pokemon) {
+    function showDetails(pokemon) {
         return function(){loadDetails(pokemon).then(function () {
-            imgPoke.setAttribute('src', pokemon.imageUrl);imgPoke.setAttribute('src', pokemon.imageUrl);
+            imgPoke.setAttribute('src', pokemon.imageUrl);
             heightPoke.innerText = pokemon.height;
             namePoke.innerText = pokemon.name
             glass.appendChild(imgPoke);
@@ -40,13 +40,32 @@ let pokemonRepository = (function () {
             typesPoke.innerText = JSON.stringify(pokemon.types)
             list.appendChild(typesPoke);
             glass.appendChild(list);
-            header.appendChild(glass);
+            document.body.appendChild(glass);
             glass.classList.add('glass');
             exitGlass.classList.add('exitGlass');
-            exitGlass.addEventListener('click', (e) =>{
-                header.removeChild(glass);
+            exitGlass.addEventListener('click', () =>{
+                document.body.removeChild(glass);;
                 typesPoke.innerText = "";
-           });
+            })
+            document.addEventListener('keydown', escapeGlass)
+            function escapeGlass(e){
+                if (e.key === 'Escape'){
+                    document.body.removeChild(glass); 
+                    document.removeEventListener('keydown', escapeGlass)
+                    document.removeEventListener('click', clickOffGlass)
+                }};
+
+
+            let glassPosition = glass.getBoundingClientRect()
+            document.addEventListener('click', clickOffGlass) 
+            function clickOffGlass(e){
+                if  (e.pageX < glassPosition.left || e.pageX > glassPosition.right|| e.pageY < glassPosition.top || e.pageY > glassPosition.bottom){
+                    document.body.removeChild(glass); 
+                    document.removeEventListener('keydown', escapeGlass)
+                    document.removeEventListener('click', clickOffGlass)
+                }
+            }
+         
         })
     }
 
@@ -77,12 +96,16 @@ let pokemonRepository = (function () {
         alertMsg.innerText = "Error Loading Resources";
         alertContainer.appendChild(alertMsg)
         header.appendChild(alertContainer)
-        setTimeOut(function () {
-            header.removeChild(alertContainer);
-            alertContainer.classList.remove('error-alert');
-        },1000)
-    }    
+        const errorDisplayTime = setTimeout(hideLoadError, 5000);
+        errorDisplayTime()
+      
+    }       
     
+    function hideLoadError(){
+        header.removeChild(alertContainer);
+            alertContainer.classList.remove('error-alert');
+    };
+
     function displayLoading(){
         alertContainer.classList.add('loading-alert')
         alertMsg.innerText = "Loading";
@@ -109,6 +132,7 @@ let pokemonRepository = (function () {
           });
         }).catch(function (e) {
           console.error(e);
+          hideLoading()
           displayLoadError()
         })
     }
@@ -126,7 +150,7 @@ let pokemonRepository = (function () {
             item.types = details.types;
         }).catch(function (e) {
             console.error(e);
-            displayCatch()
+            displayLoadError()
         });
 
     };
@@ -136,7 +160,7 @@ let pokemonRepository = (function () {
       getAll: getAll,
       addListItem: addListItem,
       loadList: loadList,
-      loadDetails: loadDetails
+      loadDetails: loadDetails,
     };
   })();
 
@@ -149,8 +173,10 @@ pokemonRepository.loadList().then(function() {
     });
 });
 
-//search functionality that I cant figure out right now. WIll fix later
-let filteredResult = {}
+
+ 
+//search functionality
+
 let userSearch = document.getElementById('search');
 const searchForm = document.querySelector('#search-bar')
 searchForm.addEventListener('submit', (e) =>{
@@ -159,11 +185,21 @@ searchForm.addEventListener('submit', (e) =>{
      userSearch.value ="";
 })
 
-function filterList(){
-    filteredResult = pokemonRepository.getAll().filter(pokemon => pokemon.name.toLowerCase() === userSearch.value.toLowerCase());
-
-    console.log(JSON.stringify(filteredResult))
-
+//event listener that returns pokemon containing search value on each key-up
+userSearch.addEventListener('keyup', filterList)
+function filterList(e){
+filteredPokemon = pokemonRepository.getAll().filter(filteredPokemon => filteredPokemon.name.toLowerCase().indexOf(userSearch.value.toLowerCase()) > -1)//(userSearch.value.toLowerCase()) === 0)
+  updateListbySearch()
+  return filteredPokemon
 }
 
+//update pokemon list
+function updateListbySearch(){  
+    //clear <ul> diplaying pokemon
+    deckContainer.innerHTML = '';  
+    filteredPokemon.forEach(function(filteredPokemon){
+        pokemonRepository.addListItem(filteredPokemon);
+        console.log(filteredPokemon)
+    });
 
+} 
