@@ -1,2 +1,3 @@
 # pokeProject
-CF into JS project
+CF intro JS project.
+
