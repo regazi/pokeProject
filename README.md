@@ -1,7 +1,7 @@
 # pokeProject
 This is my first achievement in the CareerFoundry 'Full-Stack Developer' course. 
 
-THis app allows users to search/scroll through a list of pokemon, with the option to click on the
+This app allows users to search/scroll through a list of pokemon, with the option to click on the
 pokemon name and open a modal containing pokemon picture, types, height, and abilities. 
 
 App fetches list of pokemon from pokeapp API.
