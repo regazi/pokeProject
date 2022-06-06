@@ -137,7 +137,7 @@ let pokemonRepository = (function () {
   $("input").on("search", filterList);
   userSearch.addEventListener("keyup", filterList);
   function filterList() {
-  let  filteredPokemon = pokemonRepository
+ const filteredPokemon = pokemonRepository
       .getAll()
       .filter(
         (filteredPokemon) =>
@@ -153,17 +153,17 @@ let pokemonRepository = (function () {
       $("#sub").removeClass("btn-outline-danger");
       userSearch.classList.remove("is-invalid");
     }
-    updateListbySearch();
-    return filteredPokemon;
+    console.log(filteredPokemon.type)
+    updateListbySearch(filteredPokemon);
+    
   }
 
   //update pokemon list accoring to query
-  function updateListbySearch() {
+  function updateListbySearch(filteredPokemon) {
     //clear <ul> diplaying pokemon
     deckContainer.empty();
-    let  filteredPokemon = pokemonRepository
-    filteredPokemon.forEach(function (filteredPokemon) {
-      pokemonRepository.addListItem(filteredPokemon);
+    filteredPokemon.forEach(function (pokemon) {
+      pokemonRepository.addListItem(pokemon);
     });
   }
   // return Values------------------------------------
